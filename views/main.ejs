@@ -1,0 +1,67 @@
+<html ng-app="gitshell">
+<head>
+<title>gitshell webapp</title>
+<script type="text/javascript" src="http://code.angularjs.org/1.2.9/angular.min.js"></script>
+<script type="text/javascript">
+var app = angular.module('gitshell', []);
+
+app.controller('AppController', function($scope, $http, $window, $sce) {
+  $scope.username = "<%= username %>";
+
+  $scope.authorizedKeys = $sce.trustAsHtml("<%= authorizedKeys %>".replace(/&quot;/g, ""));
+
+  $scope.updatePassword = function() {
+    $http.post('/updatePassword', {
+      'newPassword': $scope.newPassword
+    }).success(function(stderr) {
+      if (stderr.length > 0) {
+        $window.alert('Error: ' + stderr);
+      } else {
+        $window.alert('Your password is changed.');
+      }
+    })
+  };
+
+  $scope.updateAuthorizedKeys = function() {
+    $http.post('/updateAuthorizedKeys', {
+      'authorizedKeys': $scope.authorizedKeys
+    }).success(function(stderr) {
+      if (stderr.length > 0) {
+        $window.alert('Error: ' + stderr);
+      } else {
+        $window.alert('The authorized_keys file is changed.');
+      }
+    })
+  };
+});
+</script>
+</head>
+<body>
+<div ng-controller="AppController">
+  <div>
+    <span>Username:</span>
+    <span>{{username}}</span>
+    <a href="/logout">logout</a>
+  </div>
+  <form ng-submit="updatePassword()">
+    <div>
+      <span>New password:</span>
+      <input type="password" ng-model="newPassword"/>
+      <input type="submit" value="update"/>
+    </div>
+  </form>
+  <form ng-submit="updateAuthorizedKeys()">
+    <div>
+      <div>Authorized Keys:</div>
+      <div>
+        <textarea rows="10" cols="100" ng-model="authorizedKeys"></textarea>
+      </div>
+      <div>
+        <input type="submit" value="update"/>
+      </div>
+    </div>
+  </form>
+  <form>
+</div>
+</body>
+</html>
